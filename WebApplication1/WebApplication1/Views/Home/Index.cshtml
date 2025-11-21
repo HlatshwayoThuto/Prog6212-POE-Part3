@@ -42,7 +42,8 @@
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Coordinator"))
             {
-                <a asp-controller="Coordinator" asp-action="PendingClaims" class="btn btn-success btn-sm d-block">
+                <!-- FIXED: Correct controller + action -->
+                <a asp-controller="Admin" asp-action="CoordinatorView" class="btn btn-success btn-sm d-block">
                     Review Claims
                 </a>
             }
@@ -63,7 +64,8 @@
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Manager"))
             {
-                <a asp-controller="Manager" asp-action="VerifiedClaims" class="btn btn-danger btn-sm d-block">
+                <!-- FIXED: Correct controller + action -->
+                <a asp-controller="Admin" asp-action="ManagerView" class="btn btn-danger btn-sm d-block">
                     Final Approval
                 </a>
             }

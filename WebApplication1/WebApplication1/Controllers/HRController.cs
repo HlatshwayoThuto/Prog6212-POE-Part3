@@ -38,7 +38,8 @@ namespace WebApplication1.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(User model, string password)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
             if (await _db.Users.AnyAsync(u => u.Email == model.Email))
             {
@@ -50,7 +51,6 @@ namespace WebApplication1.Controllers
             _db.Users.Add(model);
             await _db.SaveChangesAsync();
 
-            // show new credentials or deliver them externally
             TempData["SuccessMessage"] = "User created. Share credentials with the user.";
             return RedirectToAction(nameof(Index));
         }
@@ -60,6 +60,7 @@ namespace WebApplication1.Controllers
         {
             var u = await _db.Users.FindAsync(id);
             if (u == null) return NotFound();
+
             return View(u);
         }
 
@@ -80,6 +81,7 @@ namespace WebApplication1.Controllers
             u.HourlyRate = model.HourlyRate;
 
             await _db.SaveChangesAsync();
+
             TempData["SuccessMessage"] = "User updated.";
             return RedirectToAction(nameof(Index));
         }
@@ -94,12 +96,12 @@ namespace WebApplication1.Controllers
 
             _db.Users.Remove(u);
             await _db.SaveChangesAsync();
+
             TempData["SuccessMessage"] = "User removed.";
             return RedirectToAction(nameof(Index));
         }
 
-        // Generate a report (simple PDF listing users and optionally invoices)
-        // Requires PdfSharpCore (Install-Package PdfSharpCore)
+        // Generate PDF report (safe font version)
         public async Task<IActionResult> GenerateUsersPdf()
         {
             var users = await _db.Users.ToListAsync();
@@ -107,17 +109,23 @@ namespace WebApplication1.Controllers
             using var doc = new PdfDocument();
             var page = doc.AddPage();
             var gfx = XGraphics.FromPdfPage(page);
-            var font = new XFont("Verdana", 12, XFontStyleEx.Regular);
+
+            // ✔ SAFE FONTS — ALWAYS WORK
+            var titleFont = new XFont("Times New Roman", 16, XFontStyleEx.Bold);
+            var lineFont = new XFont("Times New Roman", 12, XFontStyleEx.Regular);
 
             double y = 40;
-            gfx.DrawString("HR - Users Report", new XFont("Verdana", 16, XFontStyleEx.Bold), XBrushes.Black, new XPoint(40, y));
+            gfx.DrawString("HR - Users Report", titleFont, XBrushes.Black, new XPoint(40, y));
             y += 30;
 
             foreach (var u in users)
             {
-                var line = $"{u.UserId} - {u.FullName} - {u.Email} - Role: {u.Role} - Hourly: R{u.HourlyRate:N2}";
-                gfx.DrawString(line, font, XBrushes.Black, new XPoint(40, y));
+                string line =
+                    $"{u.UserId} - {u.FullName} - {u.Email} - Role: {u.Role} - Hourly: R{u.HourlyRate:N2}";
+
+                gfx.DrawString(line, lineFont, XBrushes.Black, new XPoint(40, y));
                 y += 20;
+
                 if (y > page.Height - 60)
                 {
                     page = doc.AddPage();
@@ -129,6 +137,7 @@ namespace WebApplication1.Controllers
             using var ms = new MemoryStream();
             doc.Save(ms, false);
             ms.Position = 0;
+
             return File(ms.ToArray(), "application/pdf", "users_report.pdf");
         }
 

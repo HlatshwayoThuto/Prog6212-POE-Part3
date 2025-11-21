@@ -2,6 +2,7 @@
   "Claims": [
     {
       "ClaimId": 1,
+      "LecturerId": 0,
       "LecturerName": "Thuto H",
       "HoursWorked": 100,
       "HourlyRate": 50,
@@ -15,6 +16,7 @@
     },
     {
       "ClaimId": 2,
+      "LecturerId": 0,
       "LecturerName": "Jhon Wick",
       "HoursWorked": 78,
       "HourlyRate": 70,
@@ -28,6 +30,7 @@
     },
     {
       "ClaimId": 3,
+      "LecturerId": 0,
       "LecturerName": "Jhon stuert",
       "HoursWorked": 100,
       "HourlyRate": 200,
@@ -51,6 +54,7 @@
     },
     {
       "ClaimId": 4,
+      "LecturerId": 0,
       "LecturerName": "Tony Stark",
       "HoursWorked": 200,
       "HourlyRate": 500,
@@ -74,6 +78,7 @@
     },
     {
       "ClaimId": 5,
+      "LecturerId": 0,
       "LecturerName": "Bruce Banner",
       "HoursWorked": 150,
       "HourlyRate": 100,
@@ -84,8 +89,22 @@
       "ApprovalDate": "2025-10-22T10:21:39.1147771+02:00",
       "ApprovedBy": "Academic Manager",
       "Documents": []
+    },
+    {
+      "ClaimId": 6,
+      "LecturerId": 1,
+      "LecturerName": "Thuto",
+      "HoursWorked": 100,
+      "HourlyRate": 100,
+      "TotalAmount": 10000,
+      "Notes": "Very hard working person",
+      "Status": "Rejected",
+      "SubmissionDate": "2025-11-21T09:02:01.7056178+02:00",
+      "ApprovalDate": "2025-11-21T09:07:45.7895822+02:00",
+      "ApprovedBy": "boss",
+      "Documents": []
     }
   ],
-  "NextClaimId": 6,
+  "NextClaimId": 7,
   "NextDocumentId": 3
 }
