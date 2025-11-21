@@ -8,6 +8,7 @@ using WebApplication1.Models;
 namespace WebApplication1.Controllers
 {
     [Authorize(Roles = "HR")]
+    [Authorize(Roles = "HR")]
     public class HRController : Controller
     {
         private readonly ApplicationDbContext _db;
@@ -17,17 +18,17 @@ namespace WebApplication1.Controllers
             _db = db;
         }
 
-        // List all users
+        // ================================
+        // USER MANAGEMENT
+        // ================================
         public async Task<IActionResult> Index()
         {
             var users = await _db.Users.ToListAsync();
             return View(users);
         }
 
-        // Create - GET
         public IActionResult Create() => View(new User());
 
-        // Create - POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(User model, string password)
@@ -50,16 +51,13 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Edit GET
         public async Task<IActionResult> Edit(int id)
         {
             var u = await _db.Users.FindAsync(id);
             if (u == null) return NotFound();
-
             return View(u);
         }
 
-        // Edit POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(User model)
@@ -81,7 +79,6 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -96,9 +93,37 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // -------------------------------------------------------------------
-        //   CSV EXPORT — REPLACES PDF REPORT
-        // -------------------------------------------------------------------
+        // ================================
+        // EXPORT USERS → CSV
+        // ================================
+        [Authorize(Roles = "HR")]
+        public async Task<FileResult> ExportUsersCsv()
+        {
+            var users = await _db.Users.OrderBy(u => u.UserId).ToListAsync();
+
+            var lines = new List<string>();
+            lines.Add("UserId,FullName,Email,Role,HourlyRate");
+
+            foreach (var u in users)
+            {
+                lines.Add(
+                    $"{u.UserId}," +
+                    $"{u.FullName}," +
+                    $"{u.Email}," +
+                    $"{u.Role}," +
+                    $"{u.HourlyRate}"
+                );
+            }
+
+            var csv = string.Join("\n", lines);
+            var bytes = Encoding.UTF8.GetBytes(csv);
+
+            return File(bytes, "text/csv", "users_report.csv");
+        }
+
+        // ================================
+        // EXPORT CLAIMS → CSV
+        // ================================
         [Authorize(Roles = "HR")]
         public async Task<FileResult> ExportClaimsCsv()
         {
@@ -108,11 +133,8 @@ namespace WebApplication1.Controllers
                 .ToListAsync();
 
             var lines = new List<string>();
-
-            // HEADER
             lines.Add("ClaimId,LecturerId,HoursWorked,HourlyRate,TotalAmount,Status,SubmissionDate,Notes");
 
-            // DATA ROWS
             foreach (var c in claims)
             {
                 var total = c.HoursWorked * c.HourlyRate;
@@ -130,13 +152,15 @@ namespace WebApplication1.Controllers
                 );
             }
 
-            // Convert text → CSV file bytes
             var csv = string.Join("\n", lines);
             var bytes = Encoding.UTF8.GetBytes(csv);
 
             return File(bytes, "text/csv", "claims_report.csv");
         }
 
+        // ================================
+        // PASSWORD HASHING
+        // ================================
         private static string HashPassword(string password)
         {
             using var sha = SHA256.Create();

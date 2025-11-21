@@ -54,6 +54,7 @@ else
     </table>
 }
 
-<a asp-action="GenerateUsersPdf" class="btn btn-outline-secondary mt-3">
-    <i class="bi bi-file-earmark-pdf"></i> Download Users PDF
+<!-- UPDATED: CSV button instead of PDF button -->
+<a asp-controller="HR" asp-action="ExportUsersCsv" class="btn btn-outline-info mt-3">
+    📄 Download Users CSV
 </a>
