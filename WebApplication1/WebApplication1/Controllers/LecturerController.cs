@@ -12,29 +12,29 @@ namespace WebApplication1.Controllers
     public class LecturerController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly DataService _dataService; // Only used for getting upload folder path
         private readonly IFileProtector _protector;
 
         private readonly string[] _allowedExtensions = new[] { ".pdf", ".docx", ".xlsx" };
         private const long MAX_FILE_BYTES = 5 * 1024 * 1024;
 
-        public LecturerController(ApplicationDbContext db, DataService dataService, IFileProtector protector)
+        public LecturerController(ApplicationDbContext db, IFileProtector protector)
         {
             _db = db;
-            _dataService = dataService;
             _protector = protector;
         }
 
-        // ===========================================
-        // GET: Submit Claim (prefilled with user info)
-        // ===========================================
+        private string GetUploadsFolder()
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+        }
+
+        // GET: Submit Claim
         [HttpGet]
         public async Task<IActionResult> SubmitClaim()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
-
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = await _db.Users.FindAsync(userId);
+
             if (user == null) return Unauthorized();
 
             var model = new Claim
@@ -47,46 +47,35 @@ namespace WebApplication1.Controllers
             return View(model);
         }
 
-        // ===========================================
         // POST: Submit Claim
-        // ===========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile? supportingDocument)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
-
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var user = await _db.Users.FindAsync(userId);
-            if (user == null) return Unauthorized();
 
-            // Pull HR-set lecturer info
             claim.LecturerId = user.UserId;
             claim.LecturerName = user.FullName;
             claim.HourlyRate = user.HourlyRate;
 
-            // Hours validation
             if (claim.HoursWorked > 180)
             {
-                ModelState.AddModelError(nameof(claim.HoursWorked), "Hours exceed maximum monthly limit (180).");
+                ModelState.AddModelError(nameof(claim.HoursWorked), "Hours exceed the allowed monthly maximum (180).");
                 return View(claim);
             }
 
-            if (!ModelState.IsValid)
-                return View(claim);
-
-            // Save claim
             _db.Claims.Add(claim);
             await _db.SaveChangesAsync();
 
-            // If file uploaded, validate + encrypt
-            if (supportingDocument != null && supportingDocument.Length > 0)
+            // Document Upload
+            if (supportingDocument != null)
             {
                 var ext = Path.GetExtension(supportingDocument.FileName).ToLowerInvariant();
 
                 if (!_allowedExtensions.Contains(ext))
                 {
-                    ModelState.AddModelError("", "Invalid file type. Allowed: PDF, DOCX, XLSX.");
+                    ModelState.AddModelError("", "Only PDF, DOCX, XLSX allowed.");
                     return View(claim);
                 }
 
@@ -96,8 +85,10 @@ namespace WebApplication1.Controllers
                     return View(claim);
                 }
 
-                var uploadsFolder = _dataService.GetUploadsFolder();
-                var storedName = await _protector.SaveEncryptedAsync(supportingDocument, uploadsFolder);
+                var folder = GetUploadsFolder();
+                Directory.CreateDirectory(folder);
+
+                var storedName = await _protector.SaveEncryptedAsync(supportingDocument, folder);
 
                 var doc = new Document
                 {
@@ -116,82 +107,38 @@ namespace WebApplication1.Controllers
             return RedirectToAction("TrackClaims");
         }
 
-        // ===========================================
-        // GET: Track Claims
-        // ===========================================
+        // Track Claims
         public async Task<IActionResult> TrackClaims()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
-
-            var user = await _db.Users.FindAsync(userId);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             var claims = await _db.Claims
-                .Where(c => c.LecturerId == userId)
                 .Include(c => c.Documents)
+                .Where(c => c.LecturerId == userId)
                 .OrderByDescending(c => c.SubmissionDate)
                 .ToListAsync();
-
-            // Ensure lecturer name is correct
-            foreach (var c in claims)
-                c.LecturerName = user?.FullName ?? c.LecturerName;
 
             return View(claims);
         }
 
-        // ===========================================
-        // GET: View Single Claim (Lecturer Only)
-        // ===========================================
-        public async Task<IActionResult> ViewClaim(int id)
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
-
-            var claim = await _db.Claims
-                .Include(c => c.Documents)
-                .FirstOrDefaultAsync(c => c.ClaimId == id);
-
-            if (claim == null)
-                return NotFound();
-
-            if (claim.LecturerId != userId)
-                return Forbid(); // security!
-
-            var user = await _db.Users.FindAsync(userId);
-            claim.LecturerName = user?.FullName ?? claim.LecturerName;
-
-            return View(claim);
-        }
-
-        // ===========================================
         // Download Document
-        // ===========================================
         public async Task<IActionResult> DownloadDocument(int documentId)
         {
             var doc = await _db.Documents.FindAsync(documentId);
-            if (doc == null)
-                return NotFound();
+            if (doc == null) return NotFound();
 
-            var uploads = _dataService.GetUploadsFolder();
+            var folder = GetUploadsFolder();
+            var stream = await _protector.OpenDecryptedAsync(folder, doc.StoredFileName);
 
-            try
+            var type = doc.FileType switch
             {
-                var stream = await _protector.OpenDecryptedAsync(uploads, doc.StoredFileName);
+                ".pdf" => "application/pdf",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                _ => "application/octet-stream"
+            };
 
-                var contentType = doc.FileType.ToLowerInvariant() switch
-                {
-                    ".pdf" => "application/pdf",
-                    ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    _ => "application/octet-stream"
-                };
-
-                return File(stream, contentType, doc.FileName);
-            }
-            catch (FileNotFoundException)
-            {
-                return NotFound("File not found.");
-            }
+            return File(stream, type, doc.FileName);
         }
     }
 }
