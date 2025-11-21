@@ -1,62 +1,60 @@
 ﻿@model IEnumerable<WebApplication1.Models.Claim>
+
 @{
     ViewData["Title"] = "Coordinator - Pending Claims";
 }
 
-<h2 class="mb-4">Pending Claims (Programme Coordinator)</h2>
+<h2 class="mb-3">Pending Claims (Programme Coordinator)</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
 
 @if (!Model.Any())
 {
-    <div class="alert alert-info">There are no pending claims at this time.</div>
+    <div class="alert alert-info">No pending claims.</div>
 }
 else
 {
     <table class="table table-striped table-bordered">
-        <thead class="table-light">
+        <thead class="table-dark">
             <tr>
+                <th>ID</th>
                 <th>Lecturer</th>
-                <th>Total (R)</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Total</th>
                 <th>Submitted</th>
-                <th>Documents</th>
-                <th style="width: 200px;">Actions</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var c in Model)
             {
                 <tr>
+                    <td>@c.ClaimId</td>
                     <td>@c.LecturerName</td>
-                    <td>@c.TotalAmount.ToString("N2")</td>
-                    <td>@c.SubmissionDate.ToString("yyyy-MM-dd")</td>
-
+                    <td>@c.HoursWorked</td>
+                    <td>R @c.HourlyRate.ToString("N2")</td>
+                    <td>R @((c.HourlyRate * c.HoursWorked).ToString("N2"))</td>
+                    <td>@c.SubmissionDate.ToShortDateString()</td>
                     <td>
-                        @foreach (var d in c.Documents)
-                        {
-                            <a asp-controller="Lecturer"
-                               asp-action="DownloadDocument"
-                               asp-route-documentId="@d.DocumentId"
-                               class="btn btn-sm btn-outline-secondary mb-1">
-                                @d.FileName
-                            </a>
-                        }
-                    </td>
+                        <a asp-action="ViewClaim" asp-route-id="@c.ClaimId" class="btn btn-sm btn-info">View</a>
 
-                    <td>
-                        <form asp-action="VerifyClaim" method="post" class="d-inline">
-                            <input type="hidden" name="claimId" value="@c.ClaimId" />
-                            <button class="btn btn-success btn-sm">Verify</button>
+                        <form asp-action="VerifyClaim" asp-route-claimId="@c.ClaimId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-success">Verify</button>
                         </form>
 
-                        <form asp-action="RejectClaim" method="post" class="d-inline">
-                            <input type="hidden" name="claimId" value="@c.ClaimId" />
-                            <input type="hidden" name="role" value="Coordinator" />
-                            <button class="btn btn-danger btn-sm">Reject</button>
+                        <form asp-action="RejectClaim" asp-route-claimId="@c.ClaimId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-danger">Reject</button>
                         </form>
-
-                        <a asp-action="ViewClaim" asp-route-id="@c.ClaimId"
-                           class="btn btn-sm btn-outline-primary mt-1">
-                            View Details
-                        </a>
                     </td>
                 </tr>
             }

@@ -1,78 +1,47 @@
 ﻿@model WebApplication1.Models.Claim
-@using System.Security.Claims
 
 @{
-    ViewData["Title"] = "Claim Details";
-
-    // Determine correct back button target based on role
-    var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "";
-    var backAction = role switch
-    {
-        "Coordinator" => "CoordinatorView",
-        "Manager" => "ManagerView",
-        _ => "Index"
-    };
+    ViewData["Title"] = "View Claim Details";
 }
 
-<h2 class="mb-3">Claim Details</h2>
+<h2>Claim Details</h2>
 
 <div class="card mb-3">
-    <div class="card-header fw-bold">
-        Lecturer: @Model.LecturerName
+    <div class="card-header bg-dark text-white">
+        Claim #@Model.ClaimId
     </div>
-
     <div class="card-body">
+
+        <p><strong>Lecturer:</strong> @Model.LecturerName</p>
         <p><strong>Hours Worked:</strong> @Model.HoursWorked</p>
-        <p><strong>Hourly Rate:</strong> R @Model.HourlyRate</p>
-        <p><strong>Total Amount:</strong> <span class="fw-bold">R @Model.TotalAmount</span></p>
+        <p><strong>Hourly Rate:</strong> R @Model.HourlyRate.ToString("N2")</p>
+        <p><strong>Total Amount:</strong> <span class="fw-bold text-success">R @((Model.HourlyRate * Model.HoursWorked).ToString("N2"))</span></p>
 
-        <p>
-            <strong>Status:</strong>
-            @switch (Model.Status)
-            {
-                case "Pending":
-                    <span class="badge bg-secondary">Pending</span>
-                    break;
-                case "Verified":
-                    <span class="badge bg-info text-dark">Verified</span>
-                    break;
-                case "Approved":
-                    <span class="badge bg-success">Approved</span>
-                    break;
-                case "Rejected":
-                    <span class="badge bg-danger">Rejected</span>
-                    break;
-            }
-        </p>
-
-        <p><strong>Submitted:</strong> @Model.SubmissionDate.ToString("yyyy-MM-dd")</p>
-
-        @if (Model.ApprovalDate != null)
-        {
-            <p><strong>Last Action:</strong> @Model.ApprovalDate.Value.ToString("yyyy-MM-dd")</p>
-            <p><strong>By:</strong> @Model.ApprovedBy</p>
-        }
+        <p><strong>Status:</strong> @Model.Status</p>
+        <p><strong>Submitted:</strong> @Model.SubmissionDate.ToShortDateString()</p>
+        <p><strong>Last Updated By:</strong> @Model.ApprovedBy</p>
 
         <hr />
 
-        <h5>Supporting Documents</h5>
-        @if (!Model.Documents.Any())
+        <h5>Documents</h5>
+
+        @if (Model.Documents == null || !Model.Documents.Any())
         {
             <p class="text-muted">No documents uploaded.</p>
         }
         else
         {
-            @foreach (var d in Model.Documents)
-            {
-                <a asp-controller="Lecturer"
-                   asp-action="DownloadDocument"
-                   asp-route-documentId="@d.DocumentId"
-                   class="btn btn-outline-secondary btn-sm mb-1">
-                    @d.FileName
-                </a>
-            }
+            <ul>
+                @foreach (var doc in Model.Documents)
+                {
+                    <li>
+                        @doc.FileName
+                        <a asp-controller="Lecturer" asp-action="DownloadDocument" asp-route-documentId="@doc.DocumentId" class="btn btn-sm btn-outline-primary">Download</a>
+                    </li>
+                }
+            </ul>
         }
     </div>
 </div>
 
-<a asp-action="@backAction" class="btn btn-secondary">Back</a>
+<a onclick="history.back()" class="btn btn-secondary">Back</a>
