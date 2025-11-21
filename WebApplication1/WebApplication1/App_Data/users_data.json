@@ -1,0 +1,26 @@
+{
+  "Users": [
+    {
+      "UserId": 1,
+      "Email": "thuto@gmail.com",
+      "PasswordHash": "8D6A05EEF7A385ABEF909C89B0DE86E559DB262071EC8E5C9A7113FAFE122555",
+      "Role": "Lecturer",
+      "Name": "Thuto"
+    },
+    {
+      "UserId": 2,
+      "Email": "flash@gmail.com",
+      "PasswordHash": "3B5E08EC8227255242748DE8E21835A32A97A4DB0E3A6FBCBEEBF5BB228C5B57",
+      "Role": "Coordinator",
+      "Name": "Flash"
+    },
+    {
+      "UserId": 3,
+      "Email": "boss@gmail.com",
+      "PasswordHash": "0B107FD1EEBFAC49E02FDF3AE6DAEDDBCA53773CDD43DA1C09B687A6D52C940C",
+      "Role": "Manager",
+      "Name": "boss"
+    }
+  ],
+  "NextUserId": 4
+}

@@ -1,0 +1,12 @@
+{
+  "Users": [
+    {
+      "UserId": 1,
+      "Email": "thuto@gmail.com",
+      "PasswordHash": "8D6A05EEF7A385ABEF909C89B0DE86E559DB262071EC8E5C9A7113FAFE122555",
+      "Role": "Lecturer",
+      "Name": "Thuto"
+    }
+  ],
+  "NextUserId": 2
+}

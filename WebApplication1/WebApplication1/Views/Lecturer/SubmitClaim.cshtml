@@ -1,0 +1,88 @@
+﻿@model WebApplication1.Models.Claim
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Submit Claim";
+
+    // Logged-in lecturer name
+    var lecturerName = User.Identity?.Name ?? "";
+}
+
+<h2 class="mb-4">Submit Claim</h2>
+
+<form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <!-- Lecturer Name (Auto-filled + Readonly) -->
+    <div class="mb-3">
+        <label class="form-label">Lecturer Name</label>
+        <input class="form-control" value="@lecturerName" readonly />
+        <input type="hidden" asp-for="LecturerName" value="@lecturerName" />
+    </div>
+
+    <!-- Hours Worked -->
+    <div class="mb-3">
+        <label asp-for="HoursWorked" class="form-label"></label>
+        <input asp-for="HoursWorked" id="hoursInput" class="form-control" type="number" min="1" max="200" />
+        <span asp-validation-for="HoursWorked" class="text-danger"></span>
+    </div>
+
+    <!-- Hourly Rate -->
+    <div class="mb-3">
+        <label asp-for="HourlyRate" class="form-label"></label>
+        <input asp-for="HourlyRate" id="rateInput" class="form-control" type="number" min="50" max="500" step="0.01" />
+        <span asp-validation-for="HourlyRate" class="text-danger"></span>
+    </div>
+
+    <!-- Total Display -->
+    <div class="mb-3">
+        <label class="form-label fw-bold">Total Amount (Auto)</label>
+        <input id="totalOutput" class="form-control bg-light" readonly />
+    </div>
+
+    <!-- Notes -->
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <!-- File Upload -->
+    <div class="mb-3">
+        <label class="form-label">Supporting Document (.pdf, .docx, .xlsx — Max 5MB)</label>
+        <input id="fileInput" type="file" name="supportingDocument" class="form-control" />
+        <small id="selectedFileName" class="text-muted"></small>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg">Submit Claim</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const hoursInput = document.getElementById('hoursInput');
+        const rateInput = document.getElementById('rateInput');
+        const totalOutput = document.getElementById('totalOutput');
+
+        function updateTotal() {
+            const h = parseFloat(hoursInput?.value || 0);
+            const r = parseFloat(rateInput?.value || 0);
+            totalOutput.value = (h * r).toFixed(2);
+        }
+
+        hoursInput?.addEventListener('input', updateTotal);
+        rateInput?.addEventListener('input', updateTotal);
+
+        const fileInput = document.getElementById('fileInput');
+        const selectedFileName = document.getElementById('selectedFileName');
+
+        fileInput?.addEventListener('change', () => {
+            if (fileInput.files?.length > 0)
+                selectedFileName.textContent = "Selected: " + fileInput.files[0].name;
+            else
+                selectedFileName.textContent = "";
+        });
+    </script>
+}

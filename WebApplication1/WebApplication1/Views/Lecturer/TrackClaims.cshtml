@@ -1,0 +1,77 @@
+﻿@model IEnumerable<WebApplication1.Models.Claim>
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Track My Claims";
+
+    var loggedInLecturer = User.Identity?.Name ?? "";
+    var filteredClaims = Model.Where(c => c.LecturerName == loggedInLecturer);
+}
+
+<h2 class="mb-4">My Submitted Claims</h2>
+
+@if (!filteredClaims.Any())
+{
+    <div class="alert alert-info">You have not submitted any claims yet.</div>
+}
+else
+{
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Total (R)</th>
+                <th>Status</th>
+                <th>Submitted On</th>
+                <th>Documents</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in filteredClaims)
+            {
+                <tr>
+                    <td class="fw-bold">@c.TotalAmount.ToString("N2")</td>
+
+                    <td>
+                        @if (c.Status == "Pending")
+                        {
+                            <span class="badge bg-secondary">Pending</span>
+                        }
+                        else if (c.Status == "Verified")
+                        {
+                            <span class="badge bg-info text-dark">Verified</span>
+                        }
+                        else if (c.Status == "Approved")
+                        {
+                            <span class="badge bg-success">Approved</span>
+                        }
+                        else if (c.Status == "Rejected")
+                        {
+                            <span class="badge bg-danger">Rejected</span>
+                        }
+                    </td>
+
+                    <td>@c.SubmissionDate.ToString("yyyy-MM-dd")</td>
+
+                    <td>
+                        @if (!c.Documents.Any())
+                        {
+                            <span class="text-muted">None</span>
+                        }
+                        else
+                        {
+                            @foreach (var d in c.Documents)
+                            {
+                                <a asp-controller="Lecturer"
+                                   asp-action="DownloadDocument"
+                                   asp-route-documentId="@d.DocumentId"
+                                   class="btn btn-sm btn-outline-primary mb-1">
+                                    @d.FileName
+                                </a>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

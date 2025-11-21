@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Hero Section -->
+<section class="hero-section text-center text-light d-flex align-items-center justify-content-center">
+    <div class="container py-5">
+        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">
+            Welcome to the Lecturer Claim System
+        </h1>
+        <p class="lead mb-4 animate__animated animate__fadeInUp">
+            A secure and efficient platform to manage your lecturer claims with ease.
+        </p>
+        <div class="d-flex justify-content-center gap-3 animate__animated animate__fadeInUp">
+            <a class="btn btn-lg btn-primary px-4 shadow-sm" asp-controller="Lecturer" asp-action="SubmitClaim">
+                <i class="bi bi-pencil-square me-2"></i> Submit a Claim
+            </a>
+            <a class="btn btn-lg btn-outline-light px-4 shadow-sm" asp-controller="Lecturer" asp-action="TrackClaims">
+                <i class="bi bi-clipboard-check me-2"></i> Track My Claims
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Info Section -->
+<section class="py-5 bg-light text-center">
+    <div class="container">
+        <h2 class="fw-semibold mb-4">Why Use This System?</h2>
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-speedometer2 display-5 text-primary mb-3"></i>
+                        <h5 class="fw-bold">Fast & Easy</h5>
+                        <p>Submit your claims in minutes using our simple online form.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-shield-check display-5 text-primary mb-3"></i>
+                        <h5 class="fw-bold">Secure</h5>
+                        <p>Your data and documents are safely encrypted and stored.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="bi bi-bar-chart-line display-5 text-primary mb-3"></i>
+                        <h5 class="fw-bold">Track Progress</h5>
+                        <p>Monitor claim approvals from submission to final approval.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-4 text-center text-muted small">
+    <div class="container">
+        <p class="mb-0">&copy; @DateTime.Now.Year Lecturer Claim System | All Rights Reserved</p>
+    </div>
+</footer>
+
+<!-- Custom Styles -->
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+        min-height: 80vh;
+    }
+
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    .btn {
+        border-radius: 30px;
+    }
+
+    .hero-section h1, .hero-section p {
+        color: #f8f9fa;
+    }
+</style>

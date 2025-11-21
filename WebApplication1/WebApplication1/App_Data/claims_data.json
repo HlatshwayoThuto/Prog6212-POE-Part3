@@ -1,0 +1,110 @@
+{
+  "Claims": [
+    {
+      "ClaimId": 1,
+      "LecturerId": 0,
+      "LecturerName": "Thuto H",
+      "HoursWorked": 100,
+      "HourlyRate": 50,
+      "TotalAmount": 5000,
+      "Notes": "FWAGHYHSEDAEGRFG",
+      "Status": "Approved",
+      "SubmissionDate": "2025-10-20T20:47:49.8407359+02:00",
+      "ApprovalDate": "2025-10-20T20:48:09.0064083+02:00",
+      "ApprovedBy": "Academic Manager",
+      "Documents": []
+    },
+    {
+      "ClaimId": 2,
+      "LecturerId": 0,
+      "LecturerName": "Jhon Wick",
+      "HoursWorked": 78,
+      "HourlyRate": 70,
+      "TotalAmount": 5460,
+      "Notes": null,
+      "Status": "Rejected",
+      "SubmissionDate": "2025-10-22T10:02:12.9858185+02:00",
+      "ApprovalDate": "2025-10-22T10:02:30.7036129+02:00",
+      "ApprovedBy": "Coordinator",
+      "Documents": []
+    },
+    {
+      "ClaimId": 3,
+      "LecturerId": 0,
+      "LecturerName": "Jhon stuert",
+      "HoursWorked": 100,
+      "HourlyRate": 200,
+      "TotalAmount": 20000,
+      "Notes": "I am very hard working",
+      "Status": "Rejected",
+      "SubmissionDate": "2025-10-22T10:03:37.7850199+02:00",
+      "ApprovalDate": "2025-10-22T10:18:46.2549034+02:00",
+      "ApprovedBy": "Coordinator",
+      "Documents": [
+        {
+          "DocumentId": 1,
+          "ClaimId": 3,
+          "FileName": "Time Table.pdf",
+          "StoredFileName": "51f4e9525ebb455a8e27a99c571560fe.bin",
+          "UploadDate": "2025-10-22T10:03:37.7992212+02:00",
+          "FileSize": 789114,
+          "FileType": ".pdf"
+        }
+      ]
+    },
+    {
+      "ClaimId": 4,
+      "LecturerId": 0,
+      "LecturerName": "Tony Stark",
+      "HoursWorked": 200,
+      "HourlyRate": 500,
+      "TotalAmount": 100000,
+      "Notes": "I have completed my work for this this months shift",
+      "Status": "Rejected",
+      "SubmissionDate": "2025-10-22T10:17:33.426109+02:00",
+      "ApprovalDate": "2025-10-22T10:19:50.223145+02:00",
+      "ApprovedBy": "Manager",
+      "Documents": [
+        {
+          "DocumentId": 2,
+          "ClaimId": 4,
+          "FileName": "Time Table.docx",
+          "StoredFileName": "79b5c317b8d0441d953dd8d4c8e95bce.bin",
+          "UploadDate": "2025-10-22T10:17:33.4747555+02:00",
+          "FileSize": 39456,
+          "FileType": ".docx"
+        }
+      ]
+    },
+    {
+      "ClaimId": 5,
+      "LecturerId": 0,
+      "LecturerName": "Bruce Banner",
+      "HoursWorked": 150,
+      "HourlyRate": 100,
+      "TotalAmount": 15000,
+      "Notes": "I am the hulk",
+      "Status": "Approved",
+      "SubmissionDate": "2025-10-22T10:20:54.3356917+02:00",
+      "ApprovalDate": "2025-10-22T10:21:39.1147771+02:00",
+      "ApprovedBy": "Academic Manager",
+      "Documents": []
+    },
+    {
+      "ClaimId": 6,
+      "LecturerId": 1,
+      "LecturerName": "Thuto",
+      "HoursWorked": 100,
+      "HourlyRate": 100,
+      "TotalAmount": 10000,
+      "Notes": "Very hard working person",
+      "Status": "Rejected",
+      "SubmissionDate": "2025-11-21T09:02:01.7056178+02:00",
+      "ApprovalDate": "2025-11-21T09:07:45.7895822+02:00",
+      "ApprovedBy": "boss",
+      "Documents": []
+    }
+  ],
+  "NextClaimId": 7,
+  "NextDocumentId": 3
+}

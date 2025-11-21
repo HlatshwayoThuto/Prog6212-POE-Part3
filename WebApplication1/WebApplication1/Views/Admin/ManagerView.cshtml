@@ -1,0 +1,65 @@
+﻿@model IEnumerable<WebApplication1.Models.Claim>
+@{
+    ViewData["Title"] = "Manager - Verified Claims";
+}
+
+<h2 class="mb-4">Verified Claims (Academic Manager)</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">There are no verified claims awaiting approval.</div>
+}
+else
+{
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>Lecturer</th>
+                <th>Total (R)</th>
+                <th>Verified On</th>
+                <th>Documents</th>
+                <th style="width: 200px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.LecturerName</td>
+                    <td>@c.TotalAmount.ToString("N2")</td>
+                    <td>@c.ApprovalDate?.ToString("yyyy-MM-dd")</td>
+
+                    <td>
+                        @foreach (var d in c.Documents)
+                        {
+                            <a asp-controller="Lecturer"
+                               asp-action="DownloadDocument"
+                               asp-route-documentId="@d.DocumentId"
+                               class="btn btn-sm btn-outline-secondary mb-1">
+                                @d.FileName
+                            </a>
+                        }
+                    </td>
+
+                    <td>
+                        <form asp-action="ApproveClaim" method="post" class="d-inline">
+                            <input type="hidden" name="claimId" value="@c.ClaimId" />
+                            <button class="btn btn-primary btn-sm">Approve</button>
+                        </form>
+
+                        <form asp-action="RejectClaim" method="post" class="d-inline">
+                            <input type="hidden" name="claimId" value="@c.ClaimId" />
+                            <input type="hidden" name="role" value="Manager" />
+                            <button class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+
+                        <a asp-action="ViewClaim" asp-route-id="@c.ClaimId"
+                           class="btn btn-sm btn-outline-primary mt-1">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
