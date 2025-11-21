@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
 using System.Security.Cryptography;
 using System.Text;
 using WebApplication1.Models;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApplication1.Controllers
 {
@@ -28,10 +25,7 @@ namespace WebApplication1.Controllers
         }
 
         // Create - GET
-        public IActionResult Create()
-        {
-            return View(new User());
-        }
+        public IActionResult Create() => View(new User());
 
         // Create - POST
         [HttpPost]
@@ -48,10 +42,11 @@ namespace WebApplication1.Controllers
             }
 
             model.PasswordHash = HashPassword(password);
+
             _db.Users.Add(model);
             await _db.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "User created. Share credentials with the user.";
+            TempData["SuccessMessage"] = "User created.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -101,44 +96,45 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Generate PDF report (safe font version)
-        public async Task<IActionResult> GenerateUsersPdf()
+        // -------------------------------------------------------------------
+        //   CSV EXPORT — REPLACES PDF REPORT
+        // -------------------------------------------------------------------
+        [Authorize(Roles = "HR")]
+        public async Task<FileResult> ExportClaimsCsv()
         {
-            var users = await _db.Users.ToListAsync();
+            var claims = await _db.Claims
+                .Include(c => c.Documents)
+                .OrderBy(c => c.ClaimId)
+                .ToListAsync();
 
-            using var doc = new PdfDocument();
-            var page = doc.AddPage();
-            var gfx = XGraphics.FromPdfPage(page);
+            var lines = new List<string>();
 
-            // ✔ SAFE FONTS — ALWAYS WORK
-            var titleFont = new XFont("Times New Roman", 16, XFontStyleEx.Bold);
-            var lineFont = new XFont("Times New Roman", 12, XFontStyleEx.Regular);
+            // HEADER
+            lines.Add("ClaimId,LecturerId,HoursWorked,HourlyRate,TotalAmount,Status,SubmissionDate,Notes");
 
-            double y = 40;
-            gfx.DrawString("HR - Users Report", titleFont, XBrushes.Black, new XPoint(40, y));
-            y += 30;
-
-            foreach (var u in users)
+            // DATA ROWS
+            foreach (var c in claims)
             {
-                string line =
-                    $"{u.UserId} - {u.FullName} - {u.Email} - Role: {u.Role} - Hourly: R{u.HourlyRate:N2}";
+                var total = c.HoursWorked * c.HourlyRate;
+                string notes = c.Notes?.Replace(",", " ") ?? "";
 
-                gfx.DrawString(line, lineFont, XBrushes.Black, new XPoint(40, y));
-                y += 20;
-
-                if (y > page.Height - 60)
-                {
-                    page = doc.AddPage();
-                    gfx = XGraphics.FromPdfPage(page);
-                    y = 40;
-                }
+                lines.Add(
+                    $"{c.ClaimId}," +
+                    $"{c.LecturerId}," +
+                    $"{c.HoursWorked}," +
+                    $"{c.HourlyRate}," +
+                    $"{total}," +
+                    $"{c.Status}," +
+                    $"{c.SubmissionDate:yyyy-MM-dd}," +
+                    $"{notes}"
+                );
             }
 
-            using var ms = new MemoryStream();
-            doc.Save(ms, false);
-            ms.Position = 0;
+            // Convert text → CSV file bytes
+            var csv = string.Join("\n", lines);
+            var bytes = Encoding.UTF8.GetBytes(csv);
 
-            return File(ms.ToArray(), "application/pdf", "users_report.pdf");
+            return File(bytes, "text/csv", "claims_report.csv");
         }
 
         private static string HashPassword(string password)

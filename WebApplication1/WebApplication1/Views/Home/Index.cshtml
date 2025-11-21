@@ -42,7 +42,6 @@
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Coordinator"))
             {
-                <!-- FIXED: Correct controller + action -->
                 <a asp-controller="Admin" asp-action="CoordinatorView" class="btn btn-success btn-sm d-block">
                     Review Claims
                 </a>
@@ -64,7 +63,6 @@
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Manager"))
             {
-                <!-- FIXED: Correct controller + action -->
                 <a asp-controller="Admin" asp-action="ManagerView" class="btn btn-danger btn-sm d-block">
                     Final Approval
                 </a>
@@ -87,7 +85,11 @@
             @if (User.Identity.IsAuthenticated && User.IsInRole("HR"))
             {
                 <a asp-controller="HR" asp-action="Index" class="btn btn-info btn-sm d-block mb-2">User Management</a>
-                <a asp-controller="HR" asp-action="GenerateUsersPdf" class="btn btn-outline-info btn-sm d-block">Reports</a>
+
+                <!-- ✔ FIXED: This now calls the CSV export -->
+                <a asp-controller="HR" asp-action="ExportClaimsCsv" class="btn btn-outline-info btn-sm d-block">
+                    Reports (CSV)
+                </a>
             }
             else
             {
