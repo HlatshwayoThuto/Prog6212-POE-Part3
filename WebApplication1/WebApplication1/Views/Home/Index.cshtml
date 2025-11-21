@@ -1,113 +1,165 @@
-﻿@{
+@{
     ViewData["Title"] = "Home";
 }
 
-<div class="container py-5">
+<div class="home-wrapper py-5">
 
-    <h1 class="text-center fw-bold mb-3" style="color:#007bff;">
+    <h1 class="text-center fw-bold mb-3 home-title">
         Welcome to the Contract Monthly Claim System (CMCS)
     </h1>
 
-    <p class="text-center text-muted mb-5">
+    <p class="text-center text-light mb-5 fade-in">
         Streamlining claim submissions, approvals, and tracking for Independent Contractor Lecturers.
     </p>
 
-    <div class="row text-center">
+    <div class="row text-center justify-content-center fade-in">
 
         <!-- Lecturer Section -->
-        <div class="col-md-3 mb-4">
-            <h5 class="fw-bold" style="color:#0069d9;">Lecturer</h5>
+        <div class="col-md-3 mb-4 role-card">
+            <h5 class="fw-bold text-primary">Lecturer</h5>
             <p class="small text-muted">
                 Submit and track your monthly claims easily, with the ability to upload supporting documents.
             </p>
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Lecturer"))
             {
-                <a asp-controller="Lecturer" asp-action="SubmitClaim" class="btn btn-primary btn-sm d-block mb-2">Submit Claim</a>
-                <a asp-controller="Lecturer" asp-action="TrackClaims" class="btn btn-outline-primary btn-sm d-block">Track Claims</a>
+                <a asp-controller="Lecturer" asp-action="SubmitClaim" class="btn btn-primary btn-sm d-block mb-2 fancy-btn">Submit Claim</a>
+                <a asp-controller="Lecturer" asp-action="TrackClaims" class="btn btn-outline-primary btn-sm d-block fancy-outline-btn">Track Claims</a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm d-block mb-2">Submit Claim</a>
-                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm d-block">Track Claims</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm d-block mb-2 fancy-btn">Submit Claim</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm d-block fancy-outline-btn">Track Claims</a>
             }
         </div>
 
         <!-- Coordinator Section -->
-        <div class="col-md-3 mb-4">
-            <h5 class="fw-bold" style="color:#28a745;">Coordinator</h5>
+        <div class="col-md-3 mb-4 role-card">
+            <h5 class="fw-bold text-success">Coordinator</h5>
             <p class="small text-muted">
-                Review claims submitted by lecturers and ensure accuracy before forwarding for approval.
+                Review claims submitted by lecturers for accuracy before forwarding.
             </p>
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Coordinator"))
             {
-                <a asp-controller="Admin" asp-action="CoordinatorView" class="btn btn-success btn-sm d-block">
-                    Review Claims
-                </a>
+                <a asp-controller="Admin" asp-action="CoordinatorView" class="btn btn-success btn-sm d-block fancy-btn">Review Claims</a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-sm d-block">
-                    Review Claims
-                </a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-sm d-block fancy-btn">Review Claims</a>
             }
         </div>
 
         <!-- Manager Section -->
-        <div class="col-md-3 mb-4">
-            <h5 class="fw-bold" style="color:#dc3545;">Manager</h5>
+        <div class="col-md-3 mb-4 role-card">
+            <h5 class="fw-bold text-danger">Manager</h5>
             <p class="small text-muted">
-                Provide the final approval for claims, ensuring accountability and transparency.
+                Provide final approval for claims, ensuring accountability.
             </p>
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("Manager"))
             {
-                <a asp-controller="Admin" asp-action="ManagerView" class="btn btn-danger btn-sm d-block">
-                    Final Approval
-                </a>
+                <a asp-controller="Admin" asp-action="ManagerView" class="btn btn-danger btn-sm d-block fancy-btn">Final Approval</a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-sm d-block">
-                    Final Approval
-                </a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-sm d-block fancy-btn">Final Approval</a>
             }
         </div>
 
         <!-- HR Administrator Section -->
-        <div class="col-md-3 mb-4">
-            <h5 class="fw-bold" style="color:#17a2b8;">HR Administrator</h5>
+        <div class="col-md-3 mb-4 role-card">
+            <h5 class="fw-bold text-info">HR Administrator</h5>
             <p class="small text-muted">
-                Manage users, generate reports, and oversee the entire claims management system.
+                Manage users, generate reports, and oversee the claims system.
             </p>
 
             @if (User.Identity.IsAuthenticated && User.IsInRole("HR"))
             {
-                <a asp-controller="HR" asp-action="Index" class="btn btn-info btn-sm d-block mb-2">User Management</a>
-
-                <!-- ✔ FIXED: This now calls the CSV export -->
-                <a asp-controller="HR" asp-action="ExportClaimsCsv" class="btn btn-outline-info btn-sm d-block">
-                    Reports (CSV)
-                </a>
+                <a asp-controller="HR" asp-action="Index" class="btn btn-info btn-sm d-block fancy-btn mb-2">User Management</a>
+                <a asp-controller="HR" asp-action="ExportClaimsCsv" class="btn btn-outline-info btn-sm d-block fancy-outline-btn">Reports (CSV)</a>
             }
             else
             {
-                <a asp-controller="Account" asp-action="Login" class="btn btn-info btn-sm d-block mb-2">User Management</a>
-                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-info btn-sm d-block">Reports</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-info btn-sm d-block fancy-btn mb-2">User Management</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-info btn-sm d-block fancy-outline-btn">Reports</a>
             }
         </div>
 
     </div>
 
-    <p class="text-center text-muted small mt-4">
+    <p class="text-center text-light small mt-4 fade-in">
         © 2025 – CMCS Prototype | Functionality will expand in future phases.
     </p>
 
 </div>
 
 <style>
-    .btn {
-        border-radius: 6px;
+
+    /* Soft gradient background */
+    .home-wrapper {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: #fff;
+        min-height: 100vh;
+    }
+
+    /* Fade-in animation */
+    .fade-in {
+        animation: fade 1.2s ease-in-out;
+    }
+
+    @@keyframes fade {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Title animation */
+    .home-title {
+        color: #ffffff;
+        animation: fade 1.4s ease-in-out;
+    }
+
+    /* Card styling */
+    .role-card {
+        background: #ffffff;
+        color: #333;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .role-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+    }
+
+    /* Buttons */
+    .fancy-btn {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.25s;
+    }
+
+    .fancy-btn:hover {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+
+    .fancy-outline-btn {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: 0.25s;
+    }
+
+    .fancy-outline-btn:hover {
+        background-color: rgba(0,0,0,0.07);
+        transform: scale(1.05);
     }
 </style>
