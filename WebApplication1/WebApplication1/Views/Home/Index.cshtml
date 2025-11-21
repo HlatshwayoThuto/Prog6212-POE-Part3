@@ -2,90 +2,108 @@
     ViewData["Title"] = "Home";
 }
 
-<!-- Hero Section -->
-<section class="hero-section text-center text-light d-flex align-items-center justify-content-center">
-    <div class="container py-5">
-        <h1 class="display-4 fw-bold mb-3 animate__animated animate__fadeInDown">
-            Welcome to the Lecturer Claim System
-        </h1>
-        <p class="lead mb-4 animate__animated animate__fadeInUp">
-            A secure and efficient platform to manage your lecturer claims with ease.
-        </p>
-        <div class="d-flex justify-content-center gap-3 animate__animated animate__fadeInUp">
-            <a class="btn btn-lg btn-primary px-4 shadow-sm" asp-controller="Lecturer" asp-action="SubmitClaim">
-                <i class="bi bi-pencil-square me-2"></i> Submit a Claim
-            </a>
-            <a class="btn btn-lg btn-outline-light px-4 shadow-sm" asp-controller="Lecturer" asp-action="TrackClaims">
-                <i class="bi bi-clipboard-check me-2"></i> Track My Claims
-            </a>
+<div class="container py-5">
+
+    <h1 class="text-center fw-bold mb-3" style="color:#007bff;">
+        Welcome to the Contract Monthly Claim System (CMCS)
+    </h1>
+
+    <p class="text-center text-muted mb-5">
+        Streamlining claim submissions, approvals, and tracking for Independent Contractor Lecturers.
+    </p>
+
+    <div class="row text-center">
+
+        <!-- Lecturer Section -->
+        <div class="col-md-3 mb-4">
+            <h5 class="fw-bold" style="color:#0069d9;">Lecturer</h5>
+            <p class="small text-muted">
+                Submit and track your monthly claims easily, with the ability to upload supporting documents.
+            </p>
+
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Lecturer"))
+            {
+                <a asp-controller="Lecturer" asp-action="SubmitClaim" class="btn btn-primary btn-sm d-block mb-2">Submit Claim</a>
+                <a asp-controller="Lecturer" asp-action="TrackClaims" class="btn btn-outline-primary btn-sm d-block">Track Claims</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm d-block mb-2">Submit Claim</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm d-block">Track Claims</a>
+            }
         </div>
-    </div>
-</section>
 
-<!-- Info Section -->
-<section class="py-5 bg-light text-center">
-    <div class="container">
-        <h2 class="fw-semibold mb-4">Why Use This System?</h2>
-        <div class="row justify-content-center">
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <i class="bi bi-speedometer2 display-5 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Fast & Easy</h5>
-                        <p>Submit your claims in minutes using our simple online form.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <i class="bi bi-shield-check display-5 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Secure</h5>
-                        <p>Your data and documents are safely encrypted and stored.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <i class="bi bi-bar-chart-line display-5 text-primary mb-3"></i>
-                        <h5 class="fw-bold">Track Progress</h5>
-                        <p>Monitor claim approvals from submission to final approval.</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Coordinator Section -->
+        <div class="col-md-3 mb-4">
+            <h5 class="fw-bold" style="color:#28a745;">Coordinator</h5>
+            <p class="small text-muted">
+                Review claims submitted by lecturers and ensure accuracy before forwarding for approval.
+            </p>
+
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Coordinator"))
+            {
+                <a asp-controller="Coordinator" asp-action="PendingClaims" class="btn btn-success btn-sm d-block">
+                    Review Claims
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-sm d-block">
+                    Review Claims
+                </a>
+            }
         </div>
-    </div>
-</section>
 
-<!-- Footer -->
-<footer class="py-4 text-center text-muted small">
-    <div class="container">
-        <p class="mb-0">&copy; @DateTime.Now.Year Lecturer Claim System | All Rights Reserved</p>
-    </div>
-</footer>
+        <!-- Manager Section -->
+        <div class="col-md-3 mb-4">
+            <h5 class="fw-bold" style="color:#dc3545;">Manager</h5>
+            <p class="small text-muted">
+                Provide the final approval for claims, ensuring accountability and transparency.
+            </p>
 
-<!-- Custom Styles -->
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Manager"))
+            {
+                <a asp-controller="Manager" asp-action="VerifiedClaims" class="btn btn-danger btn-sm d-block">
+                    Final Approval
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn btn-danger btn-sm d-block">
+                    Final Approval
+                </a>
+            }
+        </div>
+
+        <!-- HR Administrator Section -->
+        <div class="col-md-3 mb-4">
+            <h5 class="fw-bold" style="color:#17a2b8;">HR Administrator</h5>
+            <p class="small text-muted">
+                Manage users, generate reports, and oversee the entire claims management system.
+            </p>
+
+            @if (User.Identity.IsAuthenticated && User.IsInRole("HR"))
+            {
+                <a asp-controller="HR" asp-action="Index" class="btn btn-info btn-sm d-block mb-2">User Management</a>
+                <a asp-controller="HR" asp-action="GenerateUsersPdf" class="btn btn-outline-info btn-sm d-block">Reports</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn btn-info btn-sm d-block mb-2">User Management</a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-info btn-sm d-block">Reports</a>
+            }
+        </div>
+
+    </div>
+
+    <p class="text-center text-muted small mt-4">
+        © 2025 – CMCS Prototype | Functionality will expand in future phases.
+    </p>
+
+</div>
+
 <style>
-    .hero-section {
-        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
-        min-height: 80vh;
-    }
-
-    .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
     .btn {
-        border-radius: 30px;
-    }
-
-    .hero-section h1, .hero-section p {
-        color: #f8f9fa;
+        border-radius: 6px;
     }
 </style>

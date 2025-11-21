@@ -1,40 +1,44 @@
 ﻿@model IEnumerable<WebApplication1.Models.Claim>
-@using System.Security.Claims
 
 @{
-    ViewData["Title"] = "Track My Claims";
-
-    var loggedInLecturer = User.Identity?.Name ?? "";
-    var filteredClaims = Model.Where(c => c.LecturerName == loggedInLecturer);
+    ViewData["Title"] = "My Claims";
 }
 
-<h2 class="mb-4">My Submitted Claims</h2>
+<h2 class="mb-3">My Claims</h2>
 
-@if (!filteredClaims.Any())
+@if (!Model.Any())
 {
-    <div class="alert alert-info">You have not submitted any claims yet.</div>
+    <div class="alert alert-info">
+        You have not submitted any claims yet.
+    </div>
 }
 else
 {
-    <table class="table table-hover align-middle">
-        <thead class="table-light">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
-                <th>Total (R)</th>
+                <th>ID</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Total</th>
                 <th>Status</th>
-                <th>Submitted On</th>
+                <th>Submitted</th>
                 <th>Documents</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var c in filteredClaims)
+            @foreach (var c in Model)
             {
                 <tr>
-                    <td class="fw-bold">@c.TotalAmount.ToString("N2")</td>
+                    <td>@c.ClaimId</td>
+                    <td>@c.HoursWorked</td>
+                    <td>R @c.HourlyRate.ToString("N2")</td>
+                    <td>R @((c.HoursWorked * c.HourlyRate).ToString("N2"))</td>
 
                     <td>
                         @if (c.Status == "Pending")
                         {
-                            <span class="badge bg-secondary">Pending</span>
+                            <span class="badge bg-warning text-dark">Pending</span>
                         }
                         else if (c.Status == "Verified")
                         {
@@ -48,26 +52,33 @@ else
                         {
                             <span class="badge bg-danger">Rejected</span>
                         }
+                        else
+                        {
+                            <span class="badge bg-secondary">@c.Status</span>
+                        }
                     </td>
 
-                    <td>@c.SubmissionDate.ToString("yyyy-MM-dd")</td>
+                    <td>@c.SubmissionDate.ToShortDateString()</td>
 
                     <td>
-                        @if (!c.Documents.Any())
+                        @if (c.Documents != null && c.Documents.Any())
                         {
-                            <span class="text-muted">None</span>
+                            <ul class="list-unstyled">
+                                @foreach (var d in c.Documents)
+                                {
+                                    <li>
+                                        <a asp-action="DownloadDocument"
+                                           asp-route-documentId="@d.DocumentId"
+                                           class="btn btn-sm btn-outline-primary">
+                                            @d.FileName
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
                         }
                         else
                         {
-                            @foreach (var d in c.Documents)
-                            {
-                                <a asp-controller="Lecturer"
-                                   asp-action="DownloadDocument"
-                                   asp-route-documentId="@d.DocumentId"
-                                   class="btn btn-sm btn-outline-primary mb-1">
-                                    @d.FileName
-                                </a>
-                            }
+                            <span class="text-muted">None</span>
                         }
                     </td>
                 </tr>

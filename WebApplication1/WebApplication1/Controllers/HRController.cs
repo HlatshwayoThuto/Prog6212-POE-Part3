@@ -107,10 +107,10 @@ namespace WebApplication1.Controllers
             using var doc = new PdfDocument();
             var page = doc.AddPage();
             var gfx = XGraphics.FromPdfPage(page);
-            var font = new XFont("Verdana", 12, XFontStyle.Regular);
+            var font = new XFont("Verdana", 12, XFontStyleEx.Regular);
 
             double y = 40;
-            gfx.DrawString("HR - Users Report", new XFont("Verdana", 16, XFontStyle.Bold), XBrushes.Black, new XPoint(40, y));
+            gfx.DrawString("HR - Users Report", new XFont("Verdana", 16, XFontStyleEx.Bold), XBrushes.Black, new XPoint(40, y));
             y += 30;
 
             foreach (var u in users)

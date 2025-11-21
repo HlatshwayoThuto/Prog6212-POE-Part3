@@ -36,10 +36,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/hlath/OneDrive/Desktop/Prog6212-POE-Part3/WebApplication1/WebApplication1/Views/Account/Register.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/hlath/OneDrive/Desktop/Prog6212-POE-Part3/WebApplication1/WebApplication1/Views/Admin/CoordinatorView.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ29vcmRpbmF0b3JWaWV3LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -86,6 +82,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/hlath/OneDrive/Desktop/Prog6212-POE-Part3/WebApplication1/WebApplication1/Views/Lecturer/TrackClaims.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVjdHVyZXJcVHJhY2tDbGFpbXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/hlath/OneDrive/Desktop/Prog6212-POE-Part3/WebApplication1/WebApplication1/Views/Lecturer/ViewClaim.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVjdHVyZXJcVmlld0NsYWltLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/hlath/OneDrive/Desktop/Prog6212-POE-Part3/WebApplication1/WebApplication1/Views/Login/LoginViewModel.cshtml]

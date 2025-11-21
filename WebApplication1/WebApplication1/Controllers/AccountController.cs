@@ -6,7 +6,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using WebApplication1.Models;
-using Claim = WebApplication1.Models.Claim;
+using AppClaim = WebApplication1.Models.Claim;
+using Claim = System.Security.Claims.Claim;
 
 namespace WebApplication1.Controllers
 {
@@ -19,7 +20,9 @@ namespace WebApplication1.Controllers
             _db = db;
         }
 
-        // PUBLIC REGISTER DISABLED — redirect to AccessDenied
+        // ==========================
+        // PUBLIC REGISTER DISABLED
+        // ==========================
         [HttpGet]
         public IActionResult Register()
         {
@@ -54,10 +57,8 @@ namespace WebApplication1.Controllers
 
             string hash = HashPassword(model.Password);
 
-            var user = _db.Users.FirstOrDefault(u =>
-                u.Email == model.Email &&
-                u.PasswordHash == hash
-            );
+            var user = await _db.Users
+                .FirstOrDefaultAsync(u => u.Email == model.Email && u.PasswordHash == hash);
 
             if (user == null)
             {
@@ -96,7 +97,7 @@ namespace WebApplication1.Controllers
         }
 
         // ==========================
-        // HELPER: Build identity with roles
+        // BUILD COOKIE IDENTITY
         // ==========================
         private ClaimsPrincipal BuildPrincipal(User user)
         {
@@ -117,12 +118,12 @@ namespace WebApplication1.Controllers
         }
 
         // ==========================
-        // HELPER: SHA256 password hashing
+        // SHA256 HASHING HELPER
         // ==========================
         private static string HashPassword(string password)
         {
             using var sha = SHA256.Create();
-            byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToHexString(bytes);
         }
     }

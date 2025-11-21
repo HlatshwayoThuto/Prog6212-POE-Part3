@@ -12,7 +12,7 @@ namespace WebApplication1.Controllers
     public class LecturerController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly DataService _dataService;    // kept for upload folder helper
+        private readonly DataService _dataService; // Only used for getting upload folder path
         private readonly IFileProtector _protector;
 
         private readonly string[] _allowedExtensions = new[] { ".pdf", ".docx", ".xlsx" };
@@ -25,7 +25,9 @@ namespace WebApplication1.Controllers
             _protector = protector;
         }
 
-        // GET: display claim form with user info pulled from DB
+        // ===========================================
+        // GET: Submit Claim (prefilled with user info)
+        // ===========================================
         [HttpGet]
         public async Task<IActionResult> SubmitClaim()
         {
@@ -45,48 +47,52 @@ namespace WebApplication1.Controllers
             return View(model);
         }
 
-        // POST: submit claim
+        // ===========================================
+        // POST: Submit Claim
+        // ===========================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile? supportingDocument)
         {
-            if (!ModelState.IsValid) return View(claim);
-
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
 
             var user = await _db.Users.FindAsync(userId);
             if (user == null) return Unauthorized();
 
-            // apply HR-stored hourly rate and lecturer info
-            claim.HourlyRate = user.HourlyRate;
+            // Pull HR-set lecturer info
             claim.LecturerId = user.UserId;
             claim.LecturerName = user.FullName;
+            claim.HourlyRate = user.HourlyRate;
 
-            // validation: maximum hours (example: 180)
+            // Hours validation
             if (claim.HoursWorked > 180)
             {
-                ModelState.AddModelError(nameof(claim.HoursWorked), "Hours exceed the monthly maximum (180).");
+                ModelState.AddModelError(nameof(claim.HoursWorked), "Hours exceed maximum monthly limit (180).");
                 return View(claim);
             }
 
-            // Save to DB (claims)
+            if (!ModelState.IsValid)
+                return View(claim);
+
+            // Save claim
             _db.Claims.Add(claim);
             await _db.SaveChangesAsync();
 
-            // Save document metadata and encrypted file using FileProtector + DataService for path
+            // If file uploaded, validate + encrypt
             if (supportingDocument != null && supportingDocument.Length > 0)
             {
                 var ext = Path.GetExtension(supportingDocument.FileName).ToLowerInvariant();
+
                 if (!_allowedExtensions.Contains(ext))
                 {
-                    ModelState.AddModelError("", "Invalid file type. Only PDF, DOCX and XLSX allowed.");
+                    ModelState.AddModelError("", "Invalid file type. Allowed: PDF, DOCX, XLSX.");
                     return View(claim);
                 }
 
                 if (supportingDocument.Length > MAX_FILE_BYTES)
                 {
-                    ModelState.AddModelError("", "File size exceeds 5MB limit.");
+                    ModelState.AddModelError("", "File exceeds 5MB limit.");
                     return View(claim);
                 }
 
@@ -110,11 +116,15 @@ namespace WebApplication1.Controllers
             return RedirectToAction("TrackClaims");
         }
 
-        // GET: track claims for logged-in lecturer
+        // ===========================================
+        // GET: Track Claims
+        // ===========================================
         public async Task<IActionResult> TrackClaims()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
+
+            var user = await _db.Users.FindAsync(userId);
 
             var claims = await _db.Claims
                 .Where(c => c.LecturerId == userId)
@@ -122,18 +132,45 @@ namespace WebApplication1.Controllers
                 .OrderByDescending(c => c.SubmissionDate)
                 .ToListAsync();
 
-            // fill lecturer name from user
-            var user = await _db.Users.FindAsync(userId);
-            foreach (var c in claims) c.LecturerName = user?.FullName ?? c.LecturerName;
+            // Ensure lecturer name is correct
+            foreach (var c in claims)
+                c.LecturerName = user?.FullName ?? c.LecturerName;
 
             return View(claims);
         }
 
-        // Download encrypted document (uses FileProtector to decrypt)
+        // ===========================================
+        // GET: View Single Claim (Lecturer Only)
+        // ===========================================
+        public async Task<IActionResult> ViewClaim(int id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId)) return Unauthorized();
+
+            var claim = await _db.Claims
+                .Include(c => c.Documents)
+                .FirstOrDefaultAsync(c => c.ClaimId == id);
+
+            if (claim == null)
+                return NotFound();
+
+            if (claim.LecturerId != userId)
+                return Forbid(); // security!
+
+            var user = await _db.Users.FindAsync(userId);
+            claim.LecturerName = user?.FullName ?? claim.LecturerName;
+
+            return View(claim);
+        }
+
+        // ===========================================
+        // Download Document
+        // ===========================================
         public async Task<IActionResult> DownloadDocument(int documentId)
         {
             var doc = await _db.Documents.FindAsync(documentId);
-            if (doc == null) return NotFound();
+            if (doc == null)
+                return NotFound();
 
             var uploads = _dataService.GetUploadsFolder();
 
@@ -153,8 +190,8 @@ namespace WebApplication1.Controllers
             }
             catch (FileNotFoundException)
             {
-                return NotFound("File not found on server.");
+                return NotFound("File not found.");
             }
         }
     }
-}   
+}
