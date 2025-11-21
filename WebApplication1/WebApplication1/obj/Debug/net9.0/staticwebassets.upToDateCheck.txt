@@ -63,6 +63,7 @@ wwwroot\lib\jquery\dist\jquery.slim.min.map
 wwwroot\lib\jquery\LICENSE.txt
 wwwroot\uploads\51f4e9525ebb455a8e27a99c571560fe.bin
 wwwroot\uploads\79b5c317b8d0441d953dd8d4c8e95bce.bin
+C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\css\site.css
 C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\favicon.ico
 C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\js\site.js
@@ -124,4 +125,3 @@ C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebAppl
 C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.slim.js
 C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\lib\jquery\dist\jquery.slim.min.map
-C:\Users\lab_services_student\Desktop\Prog6212-POE-Part3\WebApplication1\WebApplication1\wwwroot\lib\jquery\LICENSE.txt
