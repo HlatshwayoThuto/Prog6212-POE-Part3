@@ -10,15 +10,22 @@ namespace WebApplication1
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // ------------------------------------------
+            // 1) Add MVC
+            // ------------------------------------------
             builder.Services.AddControllersWithViews();
 
-            // Add EF Core (SQLite) - database file stored in App_Data/app.db
-            var conn = $"Data Source={Path.Combine(builder.Environment.ContentRootPath, "App_Data", "app.db")}";
+            // ------------------------------------------
+            // 2) Add SQL Server via appsettings.json
+            // ------------------------------------------
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(conn));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                ));
 
-            // Add Authentication (Cookies)
+            // ------------------------------------------
+            // 3) Add Authentication (Cookies)
+            // ------------------------------------------
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
@@ -26,7 +33,9 @@ namespace WebApplication1
                     options.AccessDeniedPath = "/Account/AccessDenied";
                 });
 
-            // Add Session (required by the spec)
+            // ------------------------------------------
+            // 4) Add Session support
+            // ------------------------------------------
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
             {
@@ -35,20 +44,22 @@ namespace WebApplication1
                 options.Cookie.IsEssential = true;
             });
 
-            // Register FileProtector (keep your implementation)
+            // ------------------------------------------
+            // 5) FileProtector (your existing service)
+            // ------------------------------------------
             builder.Services.AddSingleton<IFileProtector, FileProtector>();
 
             var app = builder.Build();
 
-            // Ensure EF database exists (no migrations required)
+            // ------------------------------------------
+            // 6) Ensure DB exists and seed base HR user
+            // ------------------------------------------
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 db.Database.EnsureCreated();
 
-                // -----------------------------
-                // SEED HR USER IF NOT PRESENT
-                // -----------------------------
+                // SEED HR USER IF MISSING
                 if (!db.Users.Any(u => u.Role == "HR"))
                 {
                     var hr = new User
@@ -58,10 +69,7 @@ namespace WebApplication1
                         Email = "hr@example.com",
                         Role = "HR",
                         HourlyRate = 0,
-                        PasswordHash = Convert.ToHexString(
-                            System.Security.Cryptography.SHA256.Create()
-                            .ComputeHash(System.Text.Encoding.UTF8.GetBytes("P@ssw0rd"))
-                        )
+                        PasswordHash = Hash("P@ssw0rd")
                     };
 
                     db.Users.Add(hr);
@@ -80,16 +88,24 @@ namespace WebApplication1
 
             app.UseRouting();
 
+            // MUST be in this order:
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseSession(); // session middleware
+            app.UseSession();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
+        }
+
+        // Simple SHA256 hashing helper for seeding HR
+        private static string Hash(string password)
+        {
+            using var sha = System.Security.Cryptography.SHA256.Create();
+            return Convert.ToHexString(sha.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)));
         }
     }
 }

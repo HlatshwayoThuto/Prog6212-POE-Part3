@@ -4,28 +4,30 @@ namespace WebApplication1.Models
 {
     public class User
     {
+        [Key]
         public int UserId { get; set; }
 
-        [Required, EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        [Required]
+        public string Name { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; } = string.Empty; // keep hashing
+        public string Surname { get; set; }
 
         [Required]
-        public string Role { get; set; } = "Lecturer"; // Lecturer, Coordinator, Manager, HR
+        [EmailAddress]
+        public string Email { get; set; }
 
+        // Lecturer, HR, Coordinator, Manager
         [Required]
-        public string Name { get; set; } = string.Empty;
+        public string Role { get; set; }
 
-        [Required]
-        public string Surname { get; set; } = string.Empty;
+        // HR sets this; lecturers use this for claims
+        public decimal HourlyRate { get; set; }
 
-        // Hourly rate stored by HR
-        [Range(0, 10000)]
-        public decimal HourlyRate { get; set; } = 0m;
+        // DO NOT make required — HR enters a plain password and controller hashes it
+        public string? PasswordHash { get; set; }
 
-        // convenience - full name
+        // Helper property (not mapped to the DB)
         public string FullName => $"{Name} {Surname}";
     }
 }
